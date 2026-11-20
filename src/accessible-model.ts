@@ -93,8 +93,12 @@ function ancestorTerm(steps: Step[], withSide: boolean): string {
     return sexed(last, 'father', 'mother', 'parent');
   }
   const base =
-    'great-'.repeat(n - 2) + 'grand' + sexed(last, 'father', 'mother', 'parent');
-  const side = withSide ? sexed(steps[0].sex, 'paternal ', 'maternal ', '') : '';
+    'great-'.repeat(n - 2) +
+    'grand' +
+    sexed(last, 'father', 'mother', 'parent');
+  const side = withSide
+    ? sexed(steps[0].sex, 'paternal ', 'maternal ', '')
+    : '';
   return side + base;
 }
 
@@ -104,7 +108,9 @@ function descendantTerm(steps: Step[]): string {
   if (n === 1) {
     return sexed(last, 'son', 'daughter', 'child');
   }
-  return 'great-'.repeat(n - 2) + 'grand' + sexed(last, 'son', 'daughter', 'child');
+  return (
+    'great-'.repeat(n - 2) + 'grand' + sexed(last, 'son', 'daughter', 'child')
+  );
 }
 
 /** Returns an English kinship term for a path of steps from the focal person. */
@@ -127,7 +133,12 @@ export function relationTerm(steps: Step[]): string {
   const rest = steps.slice(1);
   if (head.type === 'spouse' && all('parent', rest)) {
     if (rest.length === 1) {
-      return sexed(rest[0].sex, 'father-in-law', 'mother-in-law', 'parent-in-law');
+      return sexed(
+        rest[0].sex,
+        'father-in-law',
+        'mother-in-law',
+        'parent-in-law',
+      );
     }
     return `${singleTerm(head)}'s ${ancestorTerm(rest, false)}`;
   }
@@ -176,7 +187,9 @@ function formatDate(date: TopolaDate): string {
 }
 
 /** Formats a date or range in words, e.g. "about 1872", "between 1840 and 1845". */
-export function formatDateInWords(date: DateOrRange | null | undefined): string {
+export function formatDateInWords(
+  date: DateOrRange | null | undefined,
+): string {
   if (!date) return '';
   if (date.date) return formatDate(date.date);
   const from = date.dateRange?.from && formatDate(date.dateRange.from);
@@ -299,7 +312,9 @@ export function buildHourglassModel(
   ) {
     const node = parentsNodeId && ancestorsById.get(parentsNodeId);
     if (!node) return;
-    const slots: Array<['father' | 'mother', string | undefined, string | undefined]> = [
+    const slots: Array<
+      ['father' | 'mother', string | undefined, string | undefined]
+    > = [
       ['father', node.data.indi?.id, node.data.indiParentNodeId],
       ['mother', node.data.spouse?.id, node.data.spouseParentNodeId],
     ];
@@ -370,8 +385,17 @@ export function buildHourglassModel(
     let spouseItem: AccessibleItem | undefined;
     const spouseId = node.data.spouse?.id;
     if (spouseId) {
-      const steps: Step[] = [...personSteps, { type: 'spouse', sex: sexOf(spouseId) }];
-      spouseItem = person(spouseId, node.id!, node.data.generation!, steps, marriage);
+      const steps: Step[] = [
+        ...personSteps,
+        { type: 'spouse', sex: sexOf(spouseId) },
+      ];
+      spouseItem = person(
+        spouseId,
+        node.id!,
+        node.data.generation!,
+        steps,
+        marriage,
+      );
       spouseItem.relatives.spouses.push(personItem.key);
       personItem.relatives.spouses.push(spouseItem.key);
       if (!spouseItem.duplicateOf) {
@@ -382,7 +406,9 @@ export function buildHourglassModel(
     // Children are drawn as the nodes whose parent is this family node. A
     // child with several marriages has one node per marriage.
     const childNodes = descendants.filter((n) => n.parent === node);
-    const childIds = Array.from(new Set(childNodes.map((n) => n.data.indi!.id)));
+    const childIds = Array.from(
+      new Set(childNodes.map((n) => n.data.indi!.id)),
+    );
     const parents = [personItem, spouseItem].filter(
       (x): x is AccessibleItem => !!x,
     );
@@ -391,8 +417,17 @@ export function buildHourglassModel(
     const childItems = childIds.map((childId) => {
       const nodes = childNodes.filter((n) => n.data.indi!.id === childId);
       const primary = nodes.find((n) => !n.data.additionalMarriage) || nodes[0];
-      const steps: Step[] = [...personSteps, { type: 'child', sex: sexOf(childId) }];
-      const item = person(childId, primary.id!, primary.data.generation!, steps, marriage);
+      const steps: Step[] = [
+        ...personSteps,
+        { type: 'child', sex: sexOf(childId) },
+      ];
+      const item = person(
+        childId,
+        primary.id!,
+        primary.data.generation!,
+        steps,
+        marriage,
+      );
       item.relatives.father = father?.key;
       item.relatives.mother = mother?.key;
       if (!item.duplicateOf) {
@@ -462,15 +497,30 @@ export function buildHourglassModel(
       label += `, also shown as ${first.relation || 'centre of chart'}`;
     }
     const facts = [
-      eventPhrase('born', i.getBirthDate(), i.getBirthPlace(), i.getBirthConfidence?.()),
-      eventPhrase('died', i.getDeathDate(), i.getDeathPlace(), i.getDeathConfidence?.()),
+      eventPhrase(
+        'born',
+        i.getBirthDate(),
+        i.getBirthPlace(),
+        i.getBirthConfidence?.(),
+      ),
+      eventPhrase(
+        'died',
+        i.getDeathDate(),
+        i.getDeathPlace(),
+        i.getDeathConfidence?.(),
+      ),
     ].filter((x) => !!x);
     if (!facts[1] && i.isConfirmedDeath()) facts.push('deceased');
-    if (facts.length) label += '. ' + facts.join('; ');
+    if (facts.length) {
+      const text = facts.join('; ');
+      label += '. ' + text.charAt(0).toUpperCase() + text.slice(1);
+    }
     item.label = label;
 
     const description: string[] = [];
-    (i.getOccupations?.() || []).forEach((o) => description.push(`Occupation: ${o}`));
+    (i.getOccupations?.() || []).forEach((o) =>
+      description.push(`Occupation: ${o}`),
+    );
     (i.getTitles?.() || []).forEach((t) => description.push(`Title: ${t}`));
     const linkEvidence = evidenceWords(i.getParentLinkConfidence?.());
     const parentsShown =
@@ -490,7 +540,9 @@ export function buildHourglassModel(
     const parentsFam = famc ? data.getFam(famc) : null;
     const hasParents = !!(parentsFam?.getFather() || parentsFam?.getMother());
     if (!parentsShown && !item.duplicateOf && hasParents) {
-      description.push('Parents not shown in this chart. Press Enter to centre the chart on this person');
+      description.push(
+        'Parents not shown in this chart. Press Enter to centre the chart on this person',
+      );
     }
     item.description = description.join('. ');
   });
@@ -498,19 +550,26 @@ export function buildHourglassModel(
   const people = Array.from(items.values()).filter(
     (i) => i.kind === 'person' && !i.duplicateOf,
   );
-  const count = (pred: (i: AccessibleItem) => boolean) => people.filter(pred).length;
+  const count = (pred: (i: AccessibleItem) => boolean) =>
+    people.filter(pred).length;
   const isAncestor = (i: AccessibleItem) =>
-    i !== root && /^(paternal |maternal )?((great-)*grand)?(father|mother|parent)$/.test(i.relation);
+    i !== root &&
+    /^(paternal |maternal )?((great-)*grand)?(father|mother|parent)$/.test(
+      i.relation,
+    );
   const isDescendant = (i: AccessibleItem) =>
     /^((great-)*grand)?(son|daughter|child)$/.test(i.relation);
   const ancestors = count(isAncestor);
   const descendantCount = count(isDescendant);
   const others = people.length - 1 - ancestors - descendantCount;
-  const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+  const plural = (n: number, word: string) =>
+    `${n} ${word}${n === 1 ? '' : 's'}`;
   const summary =
     `Hourglass chart centred on ${rootName}. ` +
     `${plural(ancestors, 'ancestor')}, ${plural(descendantCount, 'descendant')}` +
-    (others ? ` and ${plural(others, 'spouse')} or in-law${others === 1 ? '' : 's'}` : '') +
+    (others
+      ? ` and ${plural(others, 'spouse')} or in-law${others === 1 ? '' : 's'}`
+      : '') +
     ' shown.';
 
   return { root, items, summary };

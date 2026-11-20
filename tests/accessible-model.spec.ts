@@ -60,7 +60,7 @@ describe('buildHourglassModel', () => {
   it('roots the tree at the focal person with parents and marriages', () => {
     const m = model('I1');
     expect(m.root.indiId).toBe('I1');
-    expect(m.root.label).toMatch(/^Ada Kowal, centre of chart\. born 12 March 1900 in Kraków/);
+    expect(m.root.label).toMatch(/^Ada Kowal, centre of chart. Born 12 March 1900 in Kraków/);
     expect(m.root.children.map((c) => c.kind)).toEqual([
       'person',
       'person',
@@ -69,7 +69,7 @@ describe('buildHourglassModel', () => {
     ]);
     expect(m.root.children[0].label).toMatch(/^Jan Kowal, father/);
     expect(m.root.children[1].label).toMatch(
-      /^Maria Nowak, mother\. born about 1872 in Bochnia, Galicia, questionable evidence/,
+      /^Maria Nowak, mother. Born about 1872 in Bochnia, Galicia, questionable evidence/,
     );
   });
 
