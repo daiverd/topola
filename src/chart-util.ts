@@ -31,8 +31,8 @@ import { HIDE_TIME_MS, MOVE_TIME_MS } from './transition-util';
 export {
   H_SPACING,
   V_SPACING,
-  LayoutOptions,
-  ChartSizeInfo,
+  type LayoutOptions,
+  type ChartSizeInfo,
   getChartInfo,
   getChartInfoWithoutMargin,
   linkId,
