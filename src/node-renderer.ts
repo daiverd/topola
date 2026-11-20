@@ -50,6 +50,8 @@ export class NodeRenderer {
 
       nodeEnter
         .merge(boundNodes)
+        // Lets hosts find the drawn node, e.g. to move keyboard focus to it.
+        .attr('data-node-id', (node) => node.id!)
         .attr(
           'class',
           (node) =>

@@ -154,6 +154,19 @@ export interface ChartInfo {
   origin: [number, number];
   // Promise that is resolved after animations are finished.
   animationPromise: Promise<void>;
+  // [Experimental] The laid-out hierarchies the chart was drawn from, for
+  // building an accessible model of the chart. Set by HourglassChart.
+  layout?: HourglassLayout;
+}
+
+/**
+ * The two laid-out halves of an hourglass chart. ancestors[0] is the start
+ * node of the ancestor hierarchy; it is not drawn (descendants[0] is drawn in
+ * its place) but holds the links to the start person's parents.
+ */
+export interface HourglassLayout {
+  ancestors: Array<HierarchyPointNode<TreeNode>>;
+  descendants: Array<HierarchyPointNode<TreeNode>>;
 }
 
 export interface Chart {

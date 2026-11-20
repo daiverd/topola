@@ -256,7 +256,8 @@ export class DetailedRenderer extends CompositeRenderer implements Renderer {
     const indiEnter = indiUpdate
       .enter()
       .append('g' as string)
-      .attr('class', 'indi');
+      .attr('class', 'indi')
+      .attr('data-indi-id', (data: OffsetIndi) => data.indi.id);
     this.transition(indiEnter.merge(indiUpdate)).attr(
       'transform',
       (node) => `translate(${node.xOffset}, ${node.yOffset})`,

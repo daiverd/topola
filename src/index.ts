@@ -16,3 +16,4 @@ export * from './kinship-chart';
 export * from './relatives-chart';
 export * from './simple-api';
 export * from './simple-renderer';
+export * from './accessible-model';

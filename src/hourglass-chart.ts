@@ -47,6 +47,9 @@ export class HourglassChart<IndiT extends Indi, FamT extends Fam>
 
     const info = getChartInfo(nodes);
     this.util.updateSvgDimensions(info);
-    return Object.assign(info, { animationPromise });
+    return Object.assign(info, {
+      animationPromise,
+      layout: { ancestors: ancestorNodes, descendants: descendantNodes },
+    });
   }
 }
