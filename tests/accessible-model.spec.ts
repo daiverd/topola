@@ -53,6 +53,9 @@ describe('relationTerm', () => {
     expect(relationTerm([s('M'), p('F')])).toBe('mother-in-law');
     expect(relationTerm([c('F'), s('M')])).toBe('son-in-law');
     expect(relationTerm([c('F'), c('F'), s('M')])).toBe("granddaughter's husband");
+    expect(relationTerm([s('F'), p('M'), p('F'), p('F')])).toBe(
+      "wife's paternal great-grandmother",
+    );
   });
 });
 
@@ -93,6 +96,20 @@ describe('buildHourglassModel', () => {
     expect(second.label).toMatch(/also shown as paternal great-grandfather/);
     expect(second.children).toHaveLength(0);
     expect(first.otherOccurrences).toEqual([second.key]);
+  });
+
+  it('keeps the side for a spouse’s ancestors so duplicates differ', () => {
+    // Centred on Karl Weber: his wife Ada's great-grandparents appear twice.
+    const m = model('I10');
+    const anna = byIndi(m, 'I9');
+    expect(anna).toHaveLength(2);
+    expect(anna.map((a) => a.relation)).toEqual([
+      "wife's paternal great-grandmother",
+      "wife's maternal great-grandmother",
+    ]);
+    expect(anna[1].label).toMatch(
+      /^Anna Wrona, wife's maternal great-grandmother, also shown as wife's paternal great-grandmother\./,
+    );
   });
 
   it('states missing parents within a family', () => {

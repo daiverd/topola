@@ -140,7 +140,7 @@ export function relationTerm(steps: Step[]): string {
         'parent-in-law',
       );
     }
-    return `${singleTerm(head)}'s ${ancestorTerm(rest, false)}`;
+    return `${singleTerm(head)}'s ${ancestorTerm(rest, true)}`;
   }
   const last = steps[steps.length - 1];
   const init = steps.slice(0, -1);
@@ -494,7 +494,14 @@ export function buildHourglassModel(
     let label = `${nameOf(item.indiId!)}, ${relation}`;
     if (item.duplicateOf) {
       const first = items.get(item.duplicateOf)!;
-      label += `, also shown as ${first.relation || 'centre of chart'}`;
+      // If both places have the same kinship term (for example two
+      // great-grandmothers on the same side), the term can't tell them
+      // apart, so spell out the path instead.
+      const other =
+        first.relation && first.relation === item.relation
+          ? first.path
+          : first.relation || 'centre of chart';
+      label += `, also shown as ${other}`;
     }
     const facts = [
       eventPhrase(
